@@ -49,6 +49,24 @@ It does two things:
 ```
 
 ---
+## Screenshots & Videos
+
+<p align="center">
+  <img src="./Screenshots/Screenshot From 2026-05-29 19-06-58.png" width="800"/>
+</p>
+
+<p align="center">
+  <img src="./Screenshots/regex-demo.gif" width="800"/>
+</p>
+
+<p align="center">
+  <img src="./Screenshots/Screenshot From 2026-05-29 19-07-38.png" width="800"/>
+</p>
+
+
+
+
+---
 
 ## Supported Syntax
 
