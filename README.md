@@ -3,7 +3,7 @@
 # ⚙️ RegEx Engine
 
 ### A Regular Expression Engine built from scratch in pure Java
-### No `java.util.regex`. No shortcuts. Just logic.
+### No `java.util.regex`. 
 
 ![Java](https://img.shields.io/badge/Java-11%2B-orange?style=flat-square&logo=openjdk)
 ![Status](https://img.shields.io/badge/Status-Active%20Development-blue?style=flat-square)
@@ -33,9 +33,8 @@ It does two things:
 ## Project Structure
 
 ```
-src/
-└── com/company/ProjectMaking/
-    └── RegEx/
+
+    ── RegEx/
         ├── Briefing/
         │   ├── Bugs.txt                ← known bugs with root cause and fix plan
         │   ├── Explaination.txt        ← line-by-line explanation of how each file works
@@ -110,11 +109,11 @@ The entry point. Handles `Scanner` input, routes to the correct engine based on 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/regex-engine.git
+git clone https://github.com/iseeasta/RegExEngine.git
 
 # Open in IntelliJ IDEA
 # Navigate to:
-# src/com/company/ProjectMaking/RegEx/main/Regex.java
+# RegEx/main/Regex.java
 # Run the main() method
 ```
 
@@ -211,11 +210,5 @@ See [`LICENSE`](./LICENSE) for full details.
 
 ---
 
-## Author
-
-**Ansh**  
-BCA Student — Chaudhary Charan Singh University, Batch 2024–27  
-Building this as part of a Java portfolio for internship applications.
-
-[![GitHub](https://img.shields.io/badge/GitHub-yourusername-black?style=flat-square&logo=github)](https://github.com/yourusername)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-yourusername-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/yourusername)
+[![GitHub](https://img.shields.io/badge/GitHub-iseeasta-black?style=flat-square&logo=github)](https://github.com/iseeasta)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-iseeasta-blue?style=flat-square&logo=linkedin)](https://linkedin.com/in/iseeasta)
