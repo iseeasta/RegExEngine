@@ -1,0 +1,804 @@
+===================================================================================
+--> Here,I know its too long to read whole thing,i actually planned to write all explaination<---\n--->
+in seprate files,but i got in flow so i wrote all...
+
+-->It took a lot time to write all these things...code block was cut paste from my code so it <---\n--->
+was easier to write code in proper format here,but explanation is just a mess.
+
+-->I know ,its pain to read all but i cant edit much in (.txt) file ,so please bare with this.
+
+
+
+===================================================================================
+
+
+
+
+===================================================================================
+1)In, Regex.java
+===================================================================================
+
+--> { First,of all its the main class and program will be run from here  }
+--> { ANd, its connected to RegExGen and RegExMatch }
+
+--> {       //Just empty line,to make output look clean
+             System.out.println("   ");
+            //System.out.println("\n");  escapes more line      }
+
+
+--> {        //to wait,after printing welcome
+                     try {  Thread.sleep(1000); }
+                     catch (InterruptedException e) {  Thread.currentThread().interrupt();  }
+
+--> {        //System.out.println("1.)Pattern Matching and 2.)Pattern Generation");    }
+
+--> {        //option
+                     System.out.print("Option: ");
+                     int choice = scAn.nextInt();
+                     //consume leftover newline after nextInt()
+                     //for safety (it didnt affect even when i didnt used it)
+                     scAn.nextLine();
+
+                     System.out.println("\nYou have chosen option: " + choice);         }
+
+ All above 4 parts are just programmed/edited with statements and comments for better explaination
+ and representation of code (so it can be cleary understood)
+
+
+
+
+===================================================================================
+
+
+
+
+===================================================================================
+ 2)In, RegExGen.java
+===================================================================================
+
+ --> { This, generates regex pattern based on user input }
+ --> { And, this connected to RegExSym }
+
+ --> { This contains, that how each regex pattern gets generated }
+
+ --> {           for (int i = 0; i < patternCh.length; i++)
+                         {
+                             if (special.contains(patternCh[i]))
+                             {
+                                 switch (patternCh[i])             }
+
+      (Ignore the Syntax), Here in this part of code the loop iterates over the array <---\n--->
+      of SIZE of (< patternCH), starting from 0, and the inner loop checks that if,[SPECIAL] contains or not particular symbol <---\n--->
+      which comes when iterating over (patternCh[i]).
+
+      and ,the next part checks [Switch] checks this wit diff cases that contains logic to generate.
+
+--> {                case '+':
+                       char pChar = patternCh[i - 1];
+                       int timesPlus = rd.nextInt(4) + 1; // 1 to 4
+                       sb.append(String.valueOf(pChar).repeat(timesPlus));
+                        break;
+
+       That's the first case (+) here, we know rule (+ equals to repe of prev char if,its not <---\n--->
+       symbol,the prev char may rep one or more time).
+
+       that's what, the pChar does (that,is going back)
+       Now, the (timesPLus) is just for randomization for rep that is (max 4 and min 1)
+       and in next line (pChar got converted into string as it was char for appending,but after repeating it,
+
+--> {              case '*':
+                        char sChar = patternCh[i - 1];
+                        int timesStar = rd.nextInt(4); // 0 to 3
+                        sb.append(String.valueOf(sChar).repeat(timesStar));
+                        break;                                                  }
+
+      Same as (+) above, but the rule of (*) is (0 or more reps). <---\n--->
+      So (timesStar) goes from 0 to 3, meaning it may not even append anything (0 times). <---\n--->
+      rest is same, grab prev char, convert, repeat, append.
+
+ --> {              case '?':
+                        char qChar = patternCh[i - 1];
+                        int timesQ = rd.nextInt(2); // 0 or 1
+                        sb.append(String.valueOf(qChar).repeat(timesQ));
+                        break;                                                  }
+
+      Rule of (?) is (0 or 1 rep only, nothing more). <---\n--->
+      So (timesQ) is either 0 or 1, thats it. <---\n--->
+      grab prev char, convert, repeat either 0 or 1 time, append.
+
+ --> {              case '^':
+                        // start anchor - no output, just marks position
+                        break;                                                  }
+
+      (^) when used outside [] just means start of string anchor. <---\n--->
+      In generation mode, we dont need to output anything for it. <---\n--->
+      It just marks that the pattern starts from beginning, so we break with no action.
+
+ --> {              case '$':
+                        // end anchor - no output
+                        break;                                                  }
+
+      Same as (^) but for end of string. <---\n--->
+      In generation mode, nothing to append here either. just break.
+
+ --> {              case '.':
+                        sb.append(mixAr[rd.nextInt(mixAr.length)]);
+                        break;                                                  }
+
+      Rule of (.) is (match any single character). <---\n--->
+      So in generation, we just pick a random char from (mixAr) which contains <---\n--->
+      all lowercase a-z letters, and append it.
+
+ --> {              case '(':
+                        i++;
+                        StringBuilder groupGen = new StringBuilder();
+                        while (i < patternCh.length && patternCh[i] != ')')
+                        {
+                            groupGen.append(patternCh[i]);
+                            i++;
+                        }
+                        if (i + 1 < patternCh.length)
+                        {
+                            char next = patternCh[i + 1];
+                            if (next == '+')      { int t = rd.nextInt(3) + 1; sb.append(groupGen.toString().repeat(t)); i++; }
+                            else if (next == '*') { int t = rd.nextInt(3);     sb.append(groupGen.toString().repeat(t)); i++; }
+                            else if (next == '?') { int t = rd.nextInt(2);     sb.append(groupGen.toString().repeat(t)); i++; }
+                            else                  { sb.append(groupGen); }
+                        } else
+                        {
+                            sb.append(groupGen);
+                        }
+                        break;                                                  }
+
+      When ( is found, we move i forward by 1 to step inside the group. <---\n--->
+      Then we collect every char until ) comes, into (groupGen). <---\n--->
+      After the while loop, i is sitting exactly on ).
+
+      Now, we peek at (patternCh[i+1]) to check if there is a quantifier after the group. <---\n--->
+      If (+) is there, repeat the whole group string 1 to 3 times. <---\n--->
+      If (*) is there, repeat 0 to 2 times. <---\n--->
+      If (?) is there, repeat 0 or 1 time. <---\n--->
+      If nothing special after ), just append the group once. <---\n--->
+      In all quantifier cases, we do (i++) to skip past the quantifier symbol too.
+
+ --> {              case ')':
+                        break;                                                  }
+
+      ) is already handled inside the ( case above (the while loop stops at it). <---\n--->
+      So if somehow ) is hit directly in the switch, we just skip it. nothing to do.
+
+ --> {              case '[':
+                        i++;
+                        boolean negation = false;
+                        if (i < patternCh.length && patternCh[i] == '^') { negation = true; i++; }
+
+                        Set<Character> charSetGen = new HashSet<>();
+                        while (i < patternCh.length && patternCh[i] != ']')
+                        {
+                            if (i + 1 < patternCh.length && patternCh[i + 1] == '-' && i + 2 < patternCh.length && patternCh[i + 2] != ']')
+                            {
+                                char from = patternCh[i];
+                                char to   = patternCh[i + 2];
+                                for (char c = from; c <= to; c++) { charSetGen.add(c); }
+                                i += 2;
+                            } else
+                            {
+                                charSetGen.add(patternCh[i]);
+                            }
+                            i++;
+                        }
+
+                        if (!negation)
+                        {
+                            Character[] arr = charSetGen.toArray(new Character[0]);
+                            sb.append(arr[rd.nextInt(arr.length)]);
+                        } else
+                        {
+                            char picked;
+                            do { picked = mixAr[rd.nextInt(mixAr.length)]; }
+                            while (charSetGen.contains(picked));
+                            sb.append(picked);
+                        }
+                        break;                                                  }
+
+      When [ is found, we move i forward by 1 to step inside the class. <---\n--->
+      First check, if next char is (^). if yes, set (negation = true) and skip past it. <---\n--->
+      This means [^abc] = any char NOT in that set.
+
+      Now we walk until ] comes. Inside the while loop two cases: <---\n--->
+      Case 1 - if next char is (-) and char after that isnt ], its a RANGE like [a-z]. <---\n--->
+               So we loop from (from) to (to) and add every char in that range to charSetGen. <---\n--->
+               and we skip i by 2 to jump past the - and the end of range char.
+      Case 2 - just a plain char like [abc], add it directly to charSetGen.
+
+      After collecting all chars in charSetGen: <---\n--->
+      If NOT negation, convert set to array and pick 1 random char from it, append. <---\n--->
+      If negation [^...], keep picking random chars from mixAr until we get one NOT in charSetGen, then append.
+
+ --> {              case ']':
+                        break;                                                  }
+
+      ] is handled inside the [ case (while loop stops at it). <---\n--->
+      Same as ), if hit directly just skip it.
+
+ --> {              case '{':
+                        i++;
+                        StringBuilder countSbGen = new StringBuilder();
+                        while (i < patternCh.length && patternCh[i] != '}')
+                        {
+                            countSbGen.append(patternCh[i]);
+                            i++;
+                        }
+                        String[] partsGen = countSbGen.toString().split(",");
+                        int minGen = Integer.parseInt(partsGen[0].trim());
+                        int maxGen = partsGen.length > 1 ? Integer.parseInt(partsGen[1].trim()) : minGen;
+                        int repeatCount = minGen + rd.nextInt(maxGen - minGen + 1);
+
+                        char beforeCurly = patternCh[i - countSbGen.length() - 2];
+                        sb.append(String.valueOf(beforeCurly).repeat(repeatCount));
+                        break;                                                  }
+
+      When { is found, move i forward and collect everything until } into (countSbGen). <---\n--->
+      So for {3} we get "3", and for {2,5} we get "2,5".
+
+      Then we split on comma: <---\n--->
+      If only 1 part, like "3" -> minGen = 3, maxGen = 3 (exact count). <---\n--->
+      If 2 parts, like "2,5" -> minGen = 2, maxGen = 5 (pick random between them).
+
+      (repeatCount) = min + random within the range. <---\n--->
+      Then (beforeCurly) grabs the char that was just before { in the pattern. <---\n--->
+      and we repeat that char (repeatCount) times and append.
+
+ --> {              case '}':
+                        break;                                                  }
+
+      } is already consumed inside { case. if hit directly, skip it.
+
+ --> {              case '|':
+                        String fullPat = new String(patternCh);
+                        String[] sidesGen = fullPat.split("\\|");
+                        if (sidesGen.length == 2)
+                        {
+                            int pick = rd.nextInt(2);
+                            return generateFromPattern(sidesGen[pick].toCharArray());
+                        }
+                        break;                                                  }
+
+      When | is found, it means OR. like (cat|dog) means pick cat OR dog. <---\n--->
+      So we convert full patternCh back to String and split on | <---\n--->
+      Now we have 2 sides, left and right. <---\n--->
+      We randomly pick 0 or 1 (left or right side). <---\n--->
+      Then we RECURSIVELY call generateFromPattern on that chosen side. <---\n--->
+      and return it directly (no need to continue the loop, we got our answer).
+
+ --> {              case '\\':
+                        if (i + 1 < patternCh.length)
+                        {
+                            i++;
+                            switch (patternCh[i])
+                            {
+                                case 'd': sb.append(numAr[rd.nextInt(numAr.length)]); break;
+                                case 'w': sb.append(mixAr[rd.nextInt(mixAr.length)]); break;
+                                case 's': sb.append(' ');                              break;
+                                default:  sb.append(patternCh[i]);                    break;
+                            }
+                        }
+                        break;                                                  }
+
+      When \ is found, its an escape sequence. we move i forward by 1 to read what comes after it. <---\n--->
+      Then inner switch checks: <---\n--->
+      (\d) = digit expected, so append a random number from numAr. <---\n--->
+      (\w) = word char expected, so append a random letter from mixAr. <---\n--->
+      (\s) = whitespace expected, so append a space. <---\n--->
+      anything else like (\.) or (\() = just append that char literally.
+
+ --> {              case '-':
+                        break;                                                  }
+
+      (-) is handled inside the [ case as a range operator. <---\n--->
+      If somehow hit outside [], just skip it. nothing to generate.
+
+ --> {              default:
+                        System.out.println("Unsupported Expression: " + patternCh[i]);
+                        break;                                                  }
+
+      If some symbol hits the switch that we didn't write a case for, <---\n--->
+      we just print it as unsupported and move on. safety net basically.
+
+ --> {          } else
+                {
+                    sb.append(patternCh[i]);
+                }                                                               }
+
+      This is the ELSE of the outer (if special.contains) check. <---\n--->
+      Meaning, if the current char is NOT a special regex symbol, <---\n--->
+      it's just a plain literal character like 'a' or 'b' or '3'. <---\n--->
+      So we directly append it to sb as-is. no logic needed.
+
+ --> {          return sb.toString();   }
+
+      After the whole loop finishes going through every char in patternCh, <---\n--->
+      we return the full built string. <---\n--->
+      That's the generated output that matches the given regex pattern.
+
+
+
+
+===================================================================================
+
+
+
+
+===================================================================================
+3) In, RegExMatch.java
+===================================================================================
+
+--> { This, checks if the given text actually matches the given regex pattern }
+--> { And, this is connected to RegExSym (for the special set) }
+
+--> { This contains, the full logic of how each regex symbol is used to VERIFY the text }
+
+     (Key difference from RegExGen) <---\n--->
+     RegExGen BUILDS a string from pattern. <---\n--->
+     RegExMatch CHECKS if an existing string satisfies the pattern. <---\n--->
+     So instead of appending things, here we return (false) the moment something doesnt match.
+
+--> {          Set<Character> special = buildSpecialSet();   }
+
+     Same as RegExGen, calling (buildSpecialSet()) from RegExSym.java <---\n--->
+     gives us the HashSet of all special regex symbols. <---\n--->
+     used below to decide: is this char an operator or a plain literal.
+
+--> {          for (int i = 0; i < patternCh.length; i++)
+                       {
+                           if (special.contains(patternCh[i]))
+                           {
+                               long count;
+                               char preChar;
+                               switch (patternCh[i])             }
+
+     Same loop structure as RegExGen. iterates over every char in pattern. <---\n--->
+     if the char is special, goes into the switch. <---\n--->
+     (count) and (preChar) are declared here so they can be reused across multiple cases. <---\n--->
+     (count) = how many times a char appears in textCh. <---\n--->
+     (preChar) = the char just before the current symbol in the pattern.
+
+--> {              case '+':
+                       if (textCh.length == 0) { return false; }
+                       preChar = patternCh[i - 1];
+                       count = new String(textCh).chars().filter(c -> c == preChar).count();
+                       if (count < 1) { return false; }
+                       break;                                                  }
+
+     Rule of (+) is (1 or more). So textCh must have at LEAST 1 of the prev char. <---\n--->
+     First safety check, if textCh is completely empty, nothing can match, return false. <---\n--->
+     Then (preChar) grabs the char just before (+) in the pattern. <---\n--->
+     Then (count) counts how many times (preChar) appears in textCh using streams. <---\n--->
+     (.chars()) converts the string to an IntStream of char values. <---\n--->
+     (.filter(c -> c == preChar)) keeps only those that match preChar. <---\n--->
+     (.count()) gives the total. <---\n--->
+     If count is less than 1, (+) rule is broken, return false.
+
+--> {              case '*':
+                       preChar = patternCh[i - 1];
+                       count = new String(textCh).chars().filter(c -> c == preChar).count();
+                       // no return false needed
+                       break;                                                  }
+
+     Rule of (*) is (0 or more). So ANY count is valid, even 0. <---\n--->
+     We still calculate (count) just in case its needed later, <---\n--->
+     but we never return false here. (*) always passes. just break.
+
+--> {              case '?':
+                       preChar = patternCh[i - 1];
+                       count = new String(textCh).chars().filter(c -> c == preChar).count();
+                       if (count > 1) { return false; }
+                       break;                                                  }
+
+     Rule of (?) is (0 or 1 only). So if count is more than 1, its invalid. <---\n--->
+     Same count logic as above. <---\n--->
+     If count exceeds 1, (?) rule is broken, return false.
+
+--> {              case '^':
+                       if (i == 0)
+                       {
+                           if (i + 1 < patternCh.length && textCh.length > 0)
+                           {
+                               if (textCh[0] != patternCh[i + 1]) { return false; }
+                           }
+                       } else if (patternCh[i - 1] == '[')
+                       {
+                           Set<Character> negSet = new HashSet<>();
+                           i++;
+                           while (i < patternCh.length && patternCh[i] != ']')
+                           {
+                               if (i + 1 < patternCh.length && patternCh[i + 1] == '-' && i + 2 < patternCh.length && patternCh[i + 2] != ']')
+                               {
+                                   char from = patternCh[i];
+                                   char to   = patternCh[i + 2];
+                                   for (char c = from; c <= to; c++) { negSet.add(c); }
+                                   i += 2;
+                               } else
+                               {
+                                   negSet.add(patternCh[i]);
+                               }
+                               i++;
+                           }
+                           for (char c : textCh)
+                           {
+                               if (negSet.contains(c)) { return false; }
+                           }
+                       }
+                       break;                                                  }
+
+     (^) has TWO completely different meanings depending on where it appears. <---\n--->
+
+     MEANING 1 - if (i == 0), it's a START ANCHOR. <---\n--->
+     Means the pattern must match from the very beginning of textCh. <---\n--->
+     So we check if (textCh[0]) equals the char right after (^) in the pattern. <---\n--->
+     If not, return false. text doesnt start with what pattern demands.
+
+     MEANING 2 - if (patternCh[i-1] == '['), it's a NEGATION inside a character class. <---\n--->
+     Like [^abc] means any char that is NOT a, b, or c. <---\n--->
+     So we collect all chars after ^ until ] into (negSet). <---\n--->
+     Range handling is same as [ case below, if (-) is found between two chars its a range. <---\n--->
+     After building negSet, we loop through every char in textCh. <---\n--->
+     If even ONE char in textCh is found inside negSet, return false. <---\n--->
+     Because negation means NONE of those chars should be present.
+
+--> {              case '$':
+                       preChar = patternCh[i - 1];
+                       if (textCh[textCh.length - 1] != preChar) { return false; }
+                       break;                                                  }
+
+     ($) means END ANCHOR. the text must end with the char before ($) in pattern. <---\n--->
+     (preChar) grabs the char just before ($). <---\n--->
+     Then we check the LAST char of textCh using (textCh.length - 1). <---\n--->
+     If it doesnt match preChar, return false. text doesnt end correctly.
+
+--> {              case '.':
+                       if (textCh.length == 0) { return false; }
+                       break;                                                  }
+
+     (.) means any single character. So textCh just needs to have at least 1 char. <---\n--->
+     If textCh is empty, nothing to match against, return false. <---\n--->
+     If it has any char at all, (.) is satisfied. just break.
+
+--> {              case '(':
+                       i++;
+                       StringBuilder group = new StringBuilder();
+                       while (i < patternCh.length && patternCh[i] != ')')
+                       {
+                           group.append(patternCh[i]);
+                           i++;
+                       }
+                       if (!new String(textCh).contains(group.toString())) { return false; }
+                       break;                                                  }
+
+     When ( is found, move i forward by 1 to step inside the group. <---\n--->
+     Collect every char until ) into (group). <---\n--->
+     After the while loop, (group) has the full content of the () group as a string. <---\n--->
+     Then we convert textCh to String and check if it CONTAINS that group string. <---\n--->
+     If the group content is not found anywhere in text, return false.
+
+--> {              case ')':
+                       break;                                                  }
+
+     ) is consumed inside the ( case while loop. <---\n--->
+     If hit directly in switch, just skip it. nothing to check.
+
+--> {              case '[':
+                       i++;
+                       Set<Character> charSet = new HashSet<>();
+                       while (i < patternCh.length && patternCh[i] != ']')
+                       {
+                           if (i + 1 < patternCh.length && patternCh[i + 1] == '-' && i + 2 < patternCh.length && patternCh[i + 2] != ']')
+                           {
+                               char from = patternCh[i];
+                               char to   = patternCh[i + 2];
+                               for (char c = from; c <= to; c++) { charSet.add(c); }
+                               i += 2;
+                           } else
+                           {
+                               charSet.add(patternCh[i]);
+                           }
+                           i++;
+                       }
+                       boolean foundOne = false;
+                       for (char c : textCh)
+                       {
+                           if (charSet.contains(c)) { foundOne = true; break; }
+                       }
+                       if (!foundOne) { return false; }
+                       break;                                                  }
+
+     When [ is found, move i forward by 1 to step inside the class. <---\n--->
+     Walk until ] collecting all allowed chars into (charSet). <---\n--->
+
+     Inside the while loop two cases: <---\n--->
+     Case 1 - if next char is (-) and char after that isnt ], its a RANGE like [a-z]. <---\n--->
+              loop from (from) to (to) char by char, add all to charSet. skip i by 2. <---\n--->
+     Case 2 - plain char like [abc], add directly to charSet.
+
+     After charSet is built, loop through every char in textCh. <---\n--->
+     If even ONE char in textCh is found inside charSet, set (foundOne = true) and break. <---\n--->
+     After the loop, if (foundOne) is still false, not a single char matched, return false. <---\n--->
+     Because [] requires at least one char in textCh to be from the allowed set.
+
+--> {              case ']':
+                       break;                                                  }
+
+     ] is consumed inside the [ case while loop. if hit directly, skip it.
+
+--> {              case '{':
+                       i++;
+                       StringBuilder countSb = new StringBuilder();
+                       while (i < patternCh.length && patternCh[i] != '}')
+                       {
+                           countSb.append(patternCh[i]);
+                           i++;
+                       }
+                       String[] parts = countSb.toString().split(",");
+                       int min = Integer.parseInt(parts[0].trim());
+                       int max = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : min;
+
+                       preChar = patternCh[i - countSb.length() - 2];
+                       final char preCharFinal = preChar;
+                       long actualCount = new String(textCh).chars().filter(c -> c == preCharFinal).count();
+
+                       if (actualCount < min || actualCount > max) { return false; }
+                       break;                                                  }
+
+     When { is found, move i forward and collect everything until } into (countSb). <---\n--->
+     So for {3} we get "3", and for {2,5} we get "2,5".
+
+     Split on comma: <---\n--->
+     If 1 part like "3" -> min = 3, max = 3 (must appear exactly 3 times). <---\n--->
+     If 2 parts like "2,5" -> min = 2, max = 5 (must appear between 2 and 5 times).
+
+     (preChar) grabs the char that was just before { in the pattern. <---\n--->
+     But wait, (preChar) is used inside a lambda below, and Java lambdas require <---\n--->
+     variables to be effectively final. so we copy it into (preCharFinal) which never changes. <---\n--->
+     Then (actualCount) counts how many times (preCharFinal) appears in textCh using streams. <---\n--->
+     If actualCount is less than min OR more than max, the {} rule is broken, return false.
+
+--> {              case '}':
+                       break;                                                  }
+
+     } is consumed inside { case. if hit directly, skip it.
+
+--> {              case '|':
+                       String fullPattern = new String(patternCh);
+                       String[] sides = fullPattern.split("\\|");
+                       if (sides.length == 2)
+                       {
+                           boolean leftMatch  = isMatch(sides[0].toCharArray(), textCh);
+                           boolean rightMatch = isMatch(sides[1].toCharArray(), textCh);
+                           return leftMatch || rightMatch;
+                       }
+                       break;                                                  }
+
+     When | is found, it means OR. like (cat|dog) means text should match cat OR dog. <---\n--->
+     Convert full patternCh back to String and split on |. <---\n--->
+     Now we have left side and right side as separate patterns. <---\n--->
+     RECURSIVELY call isMatch on left side with same textCh. <---\n--->
+     RECURSIVELY call isMatch on right side with same textCh. <---\n--->
+     Return (leftMatch || rightMatch). if EITHER side matches, the whole thing matches. <---\n--->
+     We return directly here, no need to continue the loop.
+
+--> {              case '\\':
+                       if (i + 1 < patternCh.length)
+                       {
+                           i++;
+                           char escaped = patternCh[i];
+                           switch (escaped)
+                           {
+                               case 'd':
+                                   boolean hasDigit = false;
+                                   for (char c : textCh) { if (Character.isDigit(c)) { hasDigit = true; break; } }
+                                   if (!hasDigit) { return false; }
+                                   break;
+                               case 'w':
+                                   boolean hasWord = false;
+                                   for (char c : textCh) { if (Character.isLetterOrDigit(c) || c == '_') { hasWord = true; break; } }
+                                   if (!hasWord) { return false; }
+                                   break;
+                               case 's':
+                                   boolean hasSpace = false;
+                                   for (char c : textCh) { if (Character.isWhitespace(c)) { hasSpace = true; break; } }
+                                   if (!hasSpace) { return false; }
+                                   break;
+                               default:
+                                   boolean hasEscaped = false;
+                                   for (char c : textCh) { if (c == escaped) { hasEscaped = true; break; } }
+                                   if (!hasEscaped) { return false; }
+                                   break;
+                           }
+                       }
+                       break;                                                  }
+
+     When \ is found, move i forward by 1 to read what comes after it. <---\n--->
+     Store that next char in (escaped). then inner switch checks: <---\n--->
+
+     (\d) = pattern demands a digit somewhere in text. <---\n--->
+            loop through textCh, if any char passes (Character.isDigit()), set hasDigit = true. <---\n--->
+            if no digit found at all, return false.
+
+     (\w) = pattern demands a word character (letter, digit, or underscore). <---\n--->
+            loop through textCh, check (isLetterOrDigit || == '_'). <---\n--->
+            if nothing found, return false.
+
+     (\s) = pattern demands whitespace somewhere in text. <---\n--->
+            loop through textCh, check (Character.isWhitespace()). <---\n--->
+            if no whitespace found, return false.
+
+     (default) = its an escaped literal like (\.) or (\() meaning match that char literally. <---\n--->
+            loop through textCh, check if (escaped) char exists anywhere. <---\n--->
+            if not found, return false.
+
+--> {              case '-':
+                       break;                                                  }
+
+     (-) is handled inside [ case as range operator. <---\n--->
+     If hit outside [], just skip it. nothing to check.
+
+--> {              default:
+                       System.out.println("Unsupported Expression: " + patternCh[i]);
+                       break;                                                  }
+
+     If some symbol hits the switch that we didnt write a case for, <---\n--->
+     print it as unsupported and move on. same safety net as in RegExGen.
+
+--> {          } else
+               {
+                   final char literal = patternCh[i];
+                   boolean found = false;
+                   for (char c : textCh) { if (c == literal) { found = true; break; } }
+                   if (!found) { return false; }
+               }                                                               }
+
+     This is the ELSE of the outer (if special.contains) check. <---\n--->
+     Meaning, the current char in pattern is just a plain literal like 'a' or '5'. <---\n--->
+     So we check if that exact literal char exists ANYWHERE in textCh. <---\n--->
+     (literal) is marked final because its used inside the for-each loop. <---\n--->
+     Loop through textCh, if we find a match set found = true and break out early. <---\n--->
+     If after the full loop (found) is still false, that literal is missing from text, return false.
+
+--> {          return true;   }
+
+     This line is only reached if the ENTIRE loop finished without returning false. <---\n--->
+     Meaning every single check passed. every symbol, every literal, everything matched. <---\n--->
+     So we return true. text matches the pattern.
+
+     (Important note) - the original code had (return true) INSIDE the loop in the else branch. <---\n--->
+     That was wrong, it would return true after checking just the first literal char. <---\n--->
+     Fixed by moving (return true) here, AFTER the loop ends completely.
+
+
+
+
+===================================================================================
+
+
+
+
+===================================================================================
+4) In, RegExSym.java
+===================================================================================
+
+--> { This, is the foundation file of the whole regex engine }
+--> { All other files (RegExGen and RegExMatch) import and use this }
+
+--> { This contains, two things only:
+      1) RegexToken  - named constants for every special regex symbol
+      2) buildSpecialSet() - builds and returns a HashSet of all special chars  }
+
+      (Why this file exists separately) <---\n--->
+      Instead of writing '+' or '[' directly everywhere in the code, <---\n--->
+      we define them once here with proper names. <---\n--->
+      Clean, readable, and if a symbol ever needs to change, we change it in ONE place only.
+
+===================================================================================
+4a) RegexToken - the inner static class
+===================================================================================
+
+--> {          static class RegexToken
+               {
+                   static final char ADD          = '+';
+                   static final char STAR         = '*';
+                   static final char QUESTION     = '?';
+                   static final char CARET        = '^';
+                   static final char DOLLAR       = '$';
+                   static final char DOT          = '.';
+                   static final char OPEN_PAREN   = '(';
+                   static final char CLOSE_PAREN  = ')';
+                   static final char OPEN_BRACK   = '[';
+                   static final char CLOSE_BRACK  = ']';
+                   static final char OPEN_CURLY   = '{';
+                   static final char CLOSE_CURLY  = '}';
+                   static final char PIPE         = '|';
+                   static final char BACKSLASH    = '\\';
+                   static final char HYPHEN       = '-';
+               }                                                               }
+
+     This is just a container class. no methods, no logic, only constants. <---\n--->
+     Every field is (static final char) which means: <---\n--->
+
+     (static)  = belongs to the class itself, not to any object. <---\n--->
+                 you access it as (RegexToken.ADD) not (new RegexToken().ADD). <---\n--->
+     (final)   = value is locked at declaration, can never be changed later. <---\n--->
+                 its a compile-time constant basically. <---\n--->
+     (char)    = single character type.
+
+     So each line is just giving a readable NAME to a symbol: <---\n--->
+     (ADD = '+')         the plus symbol, means one or more. <---\n--->
+     (STAR = '*')        the star symbol, means zero or more. <---\n--->
+     (QUESTION = '?')    the question mark, means zero or one. <---\n--->
+     (CARET = '^')       the caret, means start anchor OR negation inside []. <---\n--->
+     (DOLLAR = '$')      the dollar, means end anchor. <---\n--->
+     (DOT = '.')         the dot, means any single character. <---\n--->
+     (OPEN_PAREN = '(')  opening bracket for groups. <---\n--->
+     (CLOSE_PAREN = ')') closing bracket for groups. <---\n--->
+     (OPEN_BRACK = '[')  opening bracket for character classes. <---\n--->
+     (CLOSE_BRACK = ']') closing bracket for character classes. <---\n--->
+     (OPEN_CURLY = '{')  opening bracket for quantifiers like {3} or {2,5}. <---\n--->
+     (CLOSE_CURLY = '}') closing bracket for quantifiers. <---\n--->
+     (PIPE = '|')        the pipe symbol, means OR. <---\n--->
+     (BACKSLASH = '\\')  the backslash for escape sequences like \d \w \s. <---\n--->
+                         (note: in Java source code, backslash needs to be written as \\
+                          because \ alone is an escape char in Java string/char literals) <---\n--->
+     (HYPHEN = '-')      the hyphen, used as range operator inside [] like [a-z].
+
+===================================================================================
+4b) buildSpecialSet() - the method
+===================================================================================
+
+--> {          public static Set<Character> buildSpecialSet()
+               {
+                   Set<Character> special = new HashSet<>();
+                   special.add('+');
+                   special.add('*');
+                   special.add('?');
+                   special.add('^');
+                   special.add('$');
+                   special.add('.');
+                   special.add('('); special.add(')');
+                   special.add('['); special.add(']');
+                   special.add('{'); special.add('}');
+                   special.add('|');
+                   special.add('\\');
+                   special.add('-');
+                   return special;
+               }                                                               }
+
+     This method creates a (HashSet<Character>) and adds every special regex symbol into it. <---\n--->
+     Then returns it.
+
+     (Why HashSet specifically) <---\n--->
+     HashSet uses hashing internally so (.contains()) check is O(1), meaning instant lookup. <---\n--->
+     If we used an array or list, every (.contains()) would scan one by one which is slower. <---\n--->
+     Since we call (.contains()) on every single char of the pattern in the main loop, <---\n--->
+     HashSet is the right choice here.
+
+     (Why public static) <---\n--->
+     (public)  = accessible from other classes like RegExGen and RegExMatch. <---\n--->
+     (static)  = can be called directly as (RegExSym.buildSpecialSet()) without creating an object. <---\n--->
+                 thats why the import at top of other files says: <---\n--->
+                 (import static com.company.ProjectMaking.RegEx.main.RegExSym.buildSpecialSet;) <---\n--->
+                 and then it can just be called as (buildSpecialSet()) directly, no class name needed.
+
+     (Why not just use RegexToken constants here instead of raw chars) <---\n--->
+     Because (special.add()) takes a char, and (RegexToken.ADD) is also a char, <---\n--->
+     so both would work exactly the same. <---\n--->
+     Using raw chars like ('+') here keeps it shorter and more readable for a simple add list. <---\n--->
+     The named constants in RegexToken are more useful when writing switch cases or conditions <---\n--->
+     where readability of the operator name matters more.
+
+     (Note on pairs written on same line) <---\n--->
+     special.add('('); special.add(')'); <---\n--->
+     special.add('['); special.add(']'); <---\n--->
+     special.add('{'); special.add('}'); <---\n--->
+     These are just written on the same line because they are pairs, open and close. <---\n--->
+     purely a style choice to visually group them. works exactly the same if written on separate lines.
+
+===================================================================================

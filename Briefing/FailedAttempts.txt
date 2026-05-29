@@ -1,0 +1,249 @@
+package com.company.ProjectMaking;
+
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.Set;
+
+public class Regex
+{
+    static class RegexToken
+    {
+
+        static final char ADD          = '+';
+        static final char STAR         = '*';
+        static final char QUESTION     = '?';
+        static final char CARET        = '^';
+        static final char DOLLAR       = '$';
+        static final char DOT          = '.';
+        static final char OPEN_PAREN   = '(';
+        static final char CLOSE_PAREN  = ')';
+        static final char OPEN_BRACK   = '[';
+        static final char CLOSE_BRACK  = ']';
+        static final char OPEN_CURLY   = '{';
+        static final char CLOSE_CURLY  = '}';
+        static final char PIPE         = '|';
+        static final char BACKSLASH    = '\\';
+        static final char HYPHEN       = '-';
+
+    }
+
+    //Main Class
+    public static void main(String[] args)
+    {
+        Scanner scAn = new Scanner(System.in);
+
+        //Instructions for the user
+        System.out.println("Welcome to the Regex Engine!");
+
+        //To wait b/w the 2 continious output
+        try
+        {
+            Thread.sleep(1000);
+
+        } catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Choose options from below:");
+        System.out.println("1.)Pattern Matching and 2.)Pattern Generation");
+
+        //Input from the user
+        int choice = scAn.nextInt();
+
+        //Condition after the user chooses the option
+        System.out.println("You have chosen option " + choice);
+
+        //global variables
+        char[] patternCh;
+        char[] textCh;
+
+        if (choice == 1)
+        {
+
+            System.out.print("Please enter the RegEx pattern (eg- a*b):");
+            String pattern = scAn.nextLine();
+
+            System.out.print("Now, enter the text to match against (eg- aab):");
+            String text = scAn.nextLine();
+
+            //Conversion
+            patternCh = pattern.toCharArray();
+            textCh = text.toCharArray();
+        }
+
+        if (choice == 2)
+        {
+            System.out.print("Please enter the RegEx pattern:");
+            String pattern = scAn.nextLine();
+
+            //Conversion
+            patternCh = pattern.toCharArray();
+        }
+
+        scAn.close();
+    }
+
+    //SubClass #02
+    static boolean isMatch(char[] patternCh, char[] textCh)
+    {
+        RegexToken token = new RegexToken();
+
+        final Set<Character> special = new HashSet<>();
+
+        special.add(token.ADD);                                                       // +
+        special.add(token.STAR);                                                      // *
+        special.add(token.QUESTION);                                                  // ?
+        special.add(token.CARET);                                                     // ^
+        special.add(token.DOLLAR);                                                    // $
+        special.add(token.DOT);                                                       // .
+        special.add(token.OPEN_PAREN); special.add(token.CLOSE_PAREN);                // ( )
+        special.add(token.OPEN_BRACK); special.add(token.CLOSE_BRACK);                // [ ]
+        special.add(token.OPEN_CURLY); special.add(token.CLOSE_CURLY);                // { }
+        special.add(token.PIPE);                                                       // |
+        special.add(token.BACKSLASH);                                                  // \
+        special.add(token.HYPHEN);                                                     // -
+
+        //Variable Declaration
+        StringBuilder sb = new StringBuilder();
+        char preChar = ' ';  String repWord = " ";
+        String mixCh = "abcdefgijklmnopqrstuvwxyz1235567890~!@#$%^&*(){}[]?><,./|";
+        String maxCh = mixCh.toUpperCase();
+        char[] mixAr = mixCh.toCharArray();
+        char[] maxAr = maxCh.toCharArray();
+        char[] num = {1,2,3,4,5,6,7,8,9,0};
+
+        //Conditions to give Output
+        for(int i = 0; i<patternCh.length; i++)
+        {
+            if(special.contains(patternCh[i]))
+            {
+                long count; Random rd = new Random();
+                switch (patternCh[i])
+                {
+                    //Add case
+                    case token.ADD:
+                        if(textCh.length == 0) {return false;}
+
+                        preChar = patternCh[i - 1];
+                        count = new String(textCh).chars().filter(c -> c == preChar).count();
+                        repWord = String.valueOf(preChar).repeat((int) count);
+                        sb.append(repWord);
+                        break;
+
+                        //Star case
+                    case token.STAR:
+
+                        preChar = patternCh[i - 1];
+                        count = new String(textCh).chars().filter(c -> c == preChar).count();
+                        repWord = String.valueOf(preChar).repeat((int) count);
+                        sb.append(repWord);
+                        break;
+
+                        //Question Case
+                    case token.QUESTION:
+
+                        preChar = patternCh[i - 1];
+                        repWord = String.valueOf(preChar).repeat( 1);
+                        sb.append(repWord);
+                        break;
+
+                    case token.CARET:
+
+                        if (patternCh[i - 1] == '[') {
+                            // skip everything until closing bracket
+                            while (i < patternCh.length && patternCh[i] != ']') {
+                                i++;
+                            }
+                        } else {
+                            preChar = patternCh[i + 1];
+                            sb.append(preChar);
+                        }
+                        break;
+
+                    case token.DOLLAR:
+
+                        preChar = patternCh[i - 1];
+                        sb.append(preChar);
+                        break;
+
+                    case token.DOT:
+
+                        char holder = patternCh[i];
+                       for(int walkmixAr = 0; walkmixAr < mixAr.length; walkmixAr++)
+                       {
+                           preChar = new String(mixAr).charAt(rd.nextInt(mixAr[walkmixAr]));
+                       }
+                       sb.append(holder);
+                       sb.append(preChar);
+                        break;
+
+                    case token.OPEN_PAREN:
+                        i++;
+
+                        // Append characters until ')' is found or end of array
+                        while (i < patternCh.length && patternCh[i] != ')') {
+                            sb.append(patternCh[i]);
+                            i++;
+                        }
+                        break;
+
+                    case token.CLOSE_PAREN:
+                        if (patternCh[i + 1]=='+')
+                        {
+                            //skip preceding element just before ) excpt thst append all
+                        if ( patternCh[i - 1] !=  '(' )
+                        {
+                            i--;
+                        }
+                        }
+                        break;
+
+                    case token.OPEN_BRACK:
+
+                        i++;
+                        if(patternCh[+ 1] == mixAr[])
+                        // Append  any 1 characters until ']' is found
+                        while (i < patternCh.length && patternCh[i] != ')') {
+                            sb.append(patternCh[i]);
+                            i++;
+                        }
+                        break;
+
+                    case token.CLOSE_BRACK:
+
+                        if()
+                        break;
+
+                    case token.OPEN_CURLY:
+                    case token.CLOSE_CURLY:
+
+                        break;
+
+                    case token.PIPE:
+
+                        break;
+
+                    case token.BACKSLASH:
+
+                        break;
+
+                    case token.HYPHEN:
+
+                        break;
+
+                    default:
+
+                        System.out.println("Unsupported Expressions");
+                        break;
+                }
+            }else
+            {
+                if(!special.contains(patternCh[i + 1]))
+                {
+                    sb.append(patternCh[i]);
+                }
+                return true;
+            }
+}

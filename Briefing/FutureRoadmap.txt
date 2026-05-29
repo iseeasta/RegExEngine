@@ -1,0 +1,152 @@
+( this is roadmap.txt file, where i am writing the future plans and features i want to add in this project )
+
+===================================================================================
+PROJECT - RegEx Engine  |  FUTURE ROADMAP
+===================================================================================
+
+     This project started as a basic regex pattern matcher and generator. <---\n--->
+     But the plan is to make it something actually useful and complete. <---\n--->
+     Below are all the things i want to do, in order of priority.
+
+===================================================================================
+PHASE 1 - FIX ALL EXISTING BUGS  ( priority : do this first, nothing else matters till this is done )
+===================================================================================
+
+--> BUG 1 : Double append on (+)(*)(?) cases
+    What happens  : literal else branch appends the char first, then quantifier appends it again.
+    Example       : "a?" gives "aa" instead of "a" or ""
+    Fix plan      : inside (+)(*)(?) cases, do (sb.deleteCharAt(sb.length() - 1))
+                    before the repeat append to remove the already-added literal.
+
+--> BUG 2 : ] leaking into output and into { case
+    What happens  : [ case picks 1 char correctly but doesnt handle its own quantifier.
+                    so (+)(*)(?)({}) after [] grab ] as the previous token instead of the set char.
+    Example       : "[abc]+" gives "c]" instead of "ccc" or "ab"
+    Fix plan      : [ case should peek at next char after ] and handle its own quantifier,
+                    exactly the same way ( case already peeks and handles (+)(*)(?) after itself.
+
+--> BUG 3 : { case index math breaking for multi-char tokens
+    What happens  : (patternCh[i - countSbGen.length() - 2]) is raw index guessing.
+                    breaks completely when prev token is \d or [] because those are multi-char.
+    Example       : "\d{3}" gives "ddd" instead of "837" or any 3 digits
+    Fix plan      : track a (lastGenerated) variable that always stores the last actually
+                    generated string. { case just repeats (lastGenerated) instead of guessing.
+
+--> BUG 4 : | inside () not processed as OR
+    What happens  : ( case collects content raw, so (ab|cd) becomes the string "ab|cd"
+                    and gets repeated with the | symbol literally in it.
+    Example       : "(ab|cd)+" gives "ab|cdab|cd" instead of "abab" or "cdcd"
+    Fix plan      : after collecting groupGen inside ( case, check if it contains |.
+                    if yes, split on | and randomly pick one side,
+                    then apply the quantifier to that chosen side only.
+
+===================================================================================
+PHASE 2 - JAVAFX UI  ( priority : after bugs are fixed )
+===================================================================================
+
+--> { Why JavaFX and not Swing }
+
+     Swing is old. it looks bad, feels bad, and has no modern styling support. <---\n--->
+     JavaFX is the actual modern Java UI framework. <---\n--->
+     it supports CSS styling, animations, clean layouts, and looks like an actual app.
+
+--> { What the UI will have }
+
+    --> Input Panel
+        - A text field where user types the regex pattern
+        - A text field where user types the text to match (for option 1)
+        - Two buttons : (Generate) and (Match)
+
+    --> Output Panel
+        - A result display area showing the generated string or match result
+        - Color coded output : green for match/success, red for no match/fail
+
+    --> Pattern Helper Sidebar
+        - A small panel on the side showing what each symbol means
+        - Like a quick reference card so user doesnt have to remember everything
+        - Clickable symbols that auto-insert into the pattern input field
+
+    --> History Panel
+        - Keeps a scrollable list of last 10-20 patterns tested
+        - So user can re-run old patterns without retyping
+
+    --> Theme
+        - Dark mode by default because nobody wants a blinding white window
+        - Clean flat design, no ugly default Java gray buttons
+
+--> { Tech plan }
+
+     JavaFX with FXML for layout separation. <---\n--->
+     CSS file for styling the whole UI. <---\n--->
+     Controller class that connects UI to RegExGen and RegExMatch. <---\n--->
+     Scene Builder can be used to design the layout visually.
+
+===================================================================================
+PHASE 3 - LOG FILE ERROR DETECTION  ( priority : after UI is done )
+===================================================================================
+
+--> { What this feature does }
+
+     Real world use case : log files from servers, apps, and systems are full of patterns. <---\n--->
+     Errors always follow a pattern. like timestamps, error codes, stack traces, etc. <---\n--->
+     This feature will let the user give a regex pattern and a .log file, <---\n--->
+     and the engine will scan the file and find all lines that match or violate the pattern.
+
+ --> {  NEXT PROJECT I AM WORKING CURRENTLY ON  }
+
+--> { What it will detect }
+
+    --> Error line detection
+        - Scan .log file line by line
+        - Flag lines that match error patterns like (ERROR|WARN|FATAL)
+        - Show line number and the matched content
+
+    --> Pattern violation detection
+        - User defines what a VALID line looks like as a regex
+        - Engine flags every line that does NOT match that pattern
+        - Useful for finding corrupted or malformed log entries
+
+    --> Summary report
+        - Total lines scanned
+        - Total matches found
+        - Total violations found
+        - Which lines had errors, shown clearly
+
+--> { Example use case }
+
+     Pattern  : \d{4}-\d{2}-\d{2} (ERROR|WARN) .+ <---\n--->
+     Log file : server.log <---\n--->
+     Output   : found 14 error lines, 3 warn lines, line numbers 42 47 89 ... etc
+
+--> { Tech plan }
+
+     BufferedReader to read .log file line by line. <---\n--->
+     Run isMatch() on each line against the given pattern. <---\n--->
+     Collect results into a report object. <---\n--->
+     Display in UI with a scrollable highlighted log viewer. <---\n--->
+     Export report as .txt file option.
+
+===================================================================================
+PHASE 4 - OPEN ( updating when i feel like adding more things )
+===================================================================================
+
+--> { Ideas i might add later, not decided yet }
+
+    - Regex pattern explainer : user gives a pattern, engine explains in plain english what it does
+    - Pattern suggester : user describes what they want in text, engine suggests a regex for it
+    - Batch testing : test multiple patterns against multiple texts at once
+    - Save and load patterns : store favourite patterns locally and reload them
+    - Regex visualizer : show how the pattern matches step by step visually in the UI
+    - Support for more escape sequences : \D \W \S \b \B etc
+    - Named capture groups : (?P<name>...) style support
+
+===================================================================================
+CURRENT STATUS
+===================================================================================
+
+    Phase 1  - IN PROGRESS  ( bugs identified, fixes planned )
+    Phase 2  - PLANNED
+    Phase 3  - PLANNED
+    Phase 4  - OPEN / ONGOING
+
+===================================================================================

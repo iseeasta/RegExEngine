@@ -1,0 +1,35 @@
+===================================================================================
+SUMMARY OF ALL BUGS FOUND
+
+NOTE:-All bugs can be fixed,but doing so disturbs the existing code and requires changes<---\n--->
+       that will be soon made,abd currently this project is under Development.
+===================================================================================
+
+--> BUG 1 : DOUBLE APPEND on (+)(*)(?) cases
+    Patterns affected : 2, 3
+    Problem  : literal else branch appends char first, then quantifier appends it again on top.
+    Fix      : do (sb.deleteCharAt(sb.length() - 1)) inside (+)(*)(?) before the repeat append.
+
+--> BUG 2 : ] LEAKING into output and into { case
+    Patterns affected : 4, 5, 7, 9, 10
+    Problem  : [ case leaves i on ], for loop moves past it, but (+)({) then grab ] as prev token.
+    Fix      : [ case must peek ahead after ] and handle its own (+)(*)(?)({}) quantifier,
+               exactly the same way ( case already does.
+
+--> BUG 3 : { case grabbing wrong char when prev token is ] or \d
+    Patterns affected : 5, 7, 9, 10
+    Problem  : (patternCh[i - countSbGen.length() - 2]) is a raw index math guess.
+               it breaks whenever the preceding token is multi-char like [] or \d.
+    Fix      : track a (lastToken) variable that stores the last actually generated string,
+               then { case just repeats (lastToken) instead of guessing from raw index.
+
+--> BUG 4 : | inside () not being processed as OR
+    Patterns affected : 8
+    Problem  : ( case collects content raw including |, repeats the whole string with | in it.
+    Fix      : after collecting groupGen, check if it contains |, split and pick one side randomly.
+
+===================================================================================
+PASSES  : patterns 1, 2 (partial), 6
+FAILS   : patterns 3, 4, 5, 7, 8, 9, 10
+===================================================================================
+
